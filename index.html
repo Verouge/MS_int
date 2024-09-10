@@ -16,6 +16,13 @@
             color: #333;
         }
 
+        #timer-display-90,
+        #timer-display-10 {
+            font-size: 2em;
+            color: #FF5722;
+            margin: 20px 0;
+        }
+
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -36,44 +43,118 @@
 <body>
     <h1>Interval Timer</h1>
     <p id="timer-status">Click "Start" to begin</p>
+
+    <div id="timer-display-90">90 sec timer: 00:00</div>
+    <div id="timer-display-10">10 sec timer: 00:00</div>
+
     <button onclick="startTimer()">Start</button>
     <button onclick="stopTimer()">Stop</button>
 
-    <audio id="pvp-levelup" src="PvpLevelUp.mp3"></audio>
-    <audio id="pickup-item" src="PickUpItem.mp3"></audio>
+    <audio id="pvp-levelup" src="pvplevelup.mp3"></audio>
+    <audio id="pickup-item" src="pickupitem.mp3"></audio>
 
     <script>
         let intervalId;
+        let countdownId90;
+        let countdownId10;
         let isRunning = false;
+        let countdown90 = 90; // 90 seconds countdown
+        let countdown10 = 10; // 10 seconds countdown
+        let display90 = document.getElementById('timer-display-90');
+        let display10 = document.getElementById('timer-display-10');
+        let timerStatus = document.getElementById('timer-status');
 
         function startTimer() {
             if (isRunning) return; // Prevents multiple timers from starting
 
             isRunning = true;
-            let timerStatus = document.getElementById('timer-status');
+            countdown90 = 90; // Reset countdown for 90 seconds
+
+            timerStatus.textContent = "Timer started";
+
+            // Start the 90 seconds countdown display
+            startCountdown90();
 
             // Play first sound after 90 seconds
             intervalId = setInterval(() => {
-                let pvpSound = document.getElementById('pvp-levelup');
-                let pickupSound = document.getElementById('pickup-item');
+                playPvPSound();
 
-                // Play pvplevelup.mp3
-                pvpSound.play();
-                timerStatus.textContent = "Playing pvplevelup.mp3";
-
-                // After 10 seconds, play pickupitem.mp3
-                setTimeout(() => {
-                    pickupSound.play();
-                    timerStatus.textContent = "Playing pickupitem.mp3";
-                }, 10000); // 10 seconds delay
+                // Reset 90-second timer after each interval
+                countdown90 = 90;
+                startCountdown90();
 
             }, 90000); // 90 seconds interval
         }
 
+        function playPvPSound() {
+            let pvpSound = document.getElementById('pvp-levelup');
+            let pickupSound = document.getElementById('pickup-item');
+
+            // Play pvplevelup.mp3
+            pvpSound.play();
+            timerStatus.textContent = "Playing pvplevelup.mp3";
+
+            // Start 10 second countdown after pvplevelup.mp3 plays
+            countdown10 = 10; // Reset 10-second timer
+            startCountdown10();
+
+            // After 10 seconds, play pickupitem.mp3
+            setTimeout(() => {
+                pickupSound.play();
+                timerStatus.textContent = "Playing pickupitem.mp3";
+            }, 10000); // 10 seconds delay
+        }
+
+        function startCountdown90() {
+            // Clear previous countdown if any
+            clearInterval(countdownId90);
+
+            countdownId90 = setInterval(() => {
+                if (countdown90 > 0) {
+                    countdown90--;
+                    updateDisplay90();
+                }
+            }, 1000); // 1 second interval
+        }
+
+        function startCountdown10() {
+            // Clear previous countdown if any
+            clearInterval(countdownId10);
+
+            countdownId10 = setInterval(() => {
+                if (countdown10 > 0) {
+                    countdown10--;
+                    updateDisplay10();
+                }
+            }, 1000); // 1 second interval
+        }
+
+        function updateDisplay90() {
+            let minutes = Math.floor(countdown90 / 60);
+            let seconds = countdown90 % 60;
+
+            // Format display to always show two digits
+            display90.textContent = `90 sec timer: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateDisplay10() {
+            let minutes = Math.floor(countdown10 / 60);
+            let seconds = countdown10 % 60;
+
+            // Format display to always show two digits
+            display10.textContent = `10 sec timer: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
         function stopTimer() {
             clearInterval(intervalId);
+            clearInterval(countdownId90);
+            clearInterval(countdownId10);
             isRunning = false;
-            document.getElementById('timer-status').textContent = "Timer stopped";
+            countdown90 = 0;
+            countdown10 = 0;
+            updateDisplay90();
+            updateDisplay10();
+            timerStatus.textContent = "Timer stopped";
         }
     </script>
 </body>
