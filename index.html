@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interval Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Interval Timer</h1>
+    <p id="timer-status">Click "Start" to begin</p>
+    <button onclick="startTimer()">Start</button>
+    <button onclick="stopTimer()">Stop</button>
+
+    <audio id="pvp-levelup" src="PvpLevelUp.mp3"></audio>
+    <audio id="pickup-item" src="PickUpItem.mp3"></audio>
+
+    <script>
+        let intervalId;
+        let isRunning = false;
+
+        function startTimer() {
+            if (isRunning) return; // Prevents multiple timers from starting
+
+            isRunning = true;
+            let timerStatus = document.getElementById('timer-status');
+
+            // Play first sound after 90 seconds
+            intervalId = setInterval(() => {
+                let pvpSound = document.getElementById('pvp-levelup');
+                let pickupSound = document.getElementById('pickup-item');
+
+                // Play pvplevelup.mp3
+                pvpSound.play();
+                timerStatus.textContent = "Playing pvplevelup.mp3";
+
+                // After 10 seconds, play pickupitem.mp3
+                setTimeout(() => {
+                    pickupSound.play();
+                    timerStatus.textContent = "Playing pickupitem.mp3";
+                }, 10000); // 10 seconds delay
+
+            }, 90000); // 90 seconds interval
+        }
+
+        function stopTimer() {
+            clearInterval(intervalId);
+            isRunning = false;
+            document.getElementById('timer-status').textContent = "Timer stopped";
+        }
+    </script>
+</body>
+
+</html>
