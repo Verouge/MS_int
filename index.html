@@ -54,7 +54,6 @@
     <audio id="pickup-item" src="pickupitem.mp3"></audio>
 
     <script>
-        let intervalId;
         let countdownId90;
         let countdownId10;
         let isRunning = false;
@@ -63,46 +62,44 @@
         let display90 = document.getElementById('timer-display-90');
         let display10 = document.getElementById('timer-display-10');
         let timerStatus = document.getElementById('timer-status');
+        let pvpSound = document.getElementById('pvp-levelup');
+        let pickupSound = document.getElementById('pickup-item');
+
+        // Set the volume to 30%
+        pvpSound.volume = 0.3;
+        pickupSound.volume = 0.3;
 
         function startTimer() {
             if (isRunning) return; // Prevents multiple timers from starting
 
             isRunning = true;
-            countdown90 = 90; // Reset countdown for 90 seconds
+            countdown90 = 90; // Start with the 90-second countdown
+            countdown10 = 10; // Initialize 10-second countdown for later
 
             timerStatus.textContent = "Timer started";
 
-            // Start the 90 seconds countdown display
+            // Start the 90-second countdown first
             startCountdown90();
-
-            // Play first sound after 90 seconds
-            intervalId = setInterval(() => {
-                playPvPSound();
-
-                // Reset 90-second timer after each interval
-                countdown90 = 90;
-                startCountdown90();
-
-            }, 90000); // 90 seconds interval
         }
 
         function playPvPSound() {
-            let pvpSound = document.getElementById('pvp-levelup');
-            let pickupSound = document.getElementById('pickup-item');
-
             // Play pvplevelup.mp3
             pvpSound.play();
             timerStatus.textContent = "Playing pvplevelup.mp3";
 
-            // Start 10 second countdown after pvplevelup.mp3 plays
+            // Start the 10-second countdown after pvplevelup.mp3 plays
             countdown10 = 10; // Reset 10-second timer
             startCountdown10();
+        }
 
-            // After 10 seconds, play pickupitem.mp3
-            setTimeout(() => {
-                pickupSound.play();
-                timerStatus.textContent = "Playing pickupitem.mp3";
-            }, 10000); // 10 seconds delay
+        function playPickupItemSound() {
+            // Play pickupitem.mp3
+            pickupSound.play();
+            timerStatus.textContent = "Playing pickupitem.mp3";
+
+            // Start the 90-second countdown again after pickupitem.mp3 plays
+            countdown90 = 90; // Reset 90-second timer
+            startCountdown90();
         }
 
         function startCountdown90() {
@@ -113,6 +110,9 @@
                 if (countdown90 > 0) {
                     countdown90--;
                     updateDisplay90();
+                } else {
+                    clearInterval(countdownId90);
+                    playPvPSound(); // Play sound after 90 seconds and start 10-second countdown
                 }
             }, 1000); // 1 second interval
         }
@@ -125,6 +125,9 @@
                 if (countdown10 > 0) {
                     countdown10--;
                     updateDisplay10();
+                } else {
+                    clearInterval(countdownId10);
+                    playPickupItemSound(); // Play pickupitem sound and then loop back to 90-second timer
                 }
             }, 1000); // 1 second interval
         }
@@ -146,7 +149,6 @@
         }
 
         function stopTimer() {
-            clearInterval(intervalId);
             clearInterval(countdownId90);
             clearInterval(countdownId10);
             isRunning = false;
